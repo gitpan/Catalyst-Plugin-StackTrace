@@ -1,0 +1,14 @@
+---
+name: Catalyst-Plugin-StackTrace
+version: 0.01
+author: ~
+abstract: Display a stack trace on the debug screen
+license: perl
+requires:
+  Catalyst: 5.61
+  Devel::StackTrace: 0
+provides:
+  Catalyst::Plugin::StackTrace:
+    file: lib/Catalyst/Plugin/StackTrace.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611
