@@ -2,15 +2,15 @@ package Catalyst::Plugin::StackTrace;
 
 use strict;
 use warnings;
-use base qw/Class::Data::Inheritable/;
+use base qw/Class::Accessor::Fast/;
 use Devel::StackTrace;
 use HTML::Entities;
 use Scalar::Util qw/blessed/;
 use NEXT;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-__PACKAGE__->mk_classdata( '_stacktrace' => [] );
+__PACKAGE__->mk_accessors('_stacktrace');
 
 sub execute {
     my $c = shift;
@@ -23,9 +23,9 @@ sub execute {
     local $SIG{__DIE__} = sub {
         my $error = shift;
         
-        # rethrow immediately if the error is a Tree::Simple object
+        # ignore if the error is a Tree::Simple object
         # because FindByUID uses an internal die several times per request
-        die $error if ( blessed($error) && $error->isa('Tree::Simple') );
+        return if ( blessed($error) && $error->isa('Tree::Simple') );
         
         my $ignore_package = [ 'Catalyst::Plugin::StackTrace' ];
         my $ignore_class   = [];
@@ -56,8 +56,6 @@ sub execute {
             no_refs        => 1,
         );
         $c->_stacktrace( [ $trace->frames ] );
-        
-        die $error;
     };
     
     return $c->NEXT::execute(@_);

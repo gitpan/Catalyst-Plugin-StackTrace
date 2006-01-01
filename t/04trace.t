@@ -21,7 +21,7 @@ open STDERR, '>/dev/null';
 # test that a crashed action prints the appropriate debug screen
 {
     ok( my $res = request('http://localhost/foo/not_ok'), 'request ok' );
-    like( $res->content, qr{Caught exception in TestApp::Controller::Foo}, 'error ok' );
+    like( $res->content, qr{Caught exception.+TestApp::Controller::Foo::three}, 'error ok' );
     like( $res->content, qr{Stack Trace}, 'trace ok' );
     like( $res->content, qr{<td>22</td>}, 'line number ok' );
     like( $res->content, qr{<b>   22:     three()}, 'context ok' );
