@@ -1,5 +1,10 @@
 Revision history for Perl extension Catalyst::Plugin::StackTrace
 
+0.03    2006-03-16 23:40:00
+        - Made the stack trace fill the entire width.
+        - Added respect_overload option for Devel::StackTrace (Stephen
+          Steneker)
+
 0.02    2006-01-01 14:00:00
         - Changed _stacktrace from class data to accessor.
         - Fixed test 4 in 04trace to handle different error messages

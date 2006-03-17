@@ -8,7 +8,7 @@ use HTML::Entities;
 use Scalar::Util qw/blessed/;
 use NEXT;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 __PACKAGE__->mk_accessors('_stacktrace');
 
@@ -51,9 +51,10 @@ sub execute {
         }
         
         my $trace = Devel::StackTrace->new(
-            ignore_package => $ignore_package,
-            ignore_class   => $ignore_class,
-            no_refs        => 1,
+            ignore_package   => $ignore_package,
+            ignore_class     => $ignore_class,
+            no_refs          => 1,
+            respect_overload => 1,
         );
         $c->_stacktrace( [ $trace->frames ] );
     };
@@ -88,8 +89,11 @@ sub finalize_error {
             <style type="text/css">
                 div.trace {
                     background-color: #5f7e7e;
-                }  
-                th, td { 
+                }
+                div#stacktrace table {
+                    width: 100%;
+                }
+                div#stacktrace th, td { 
                     padding-right: 1.5em;
                     text-align: left;
                 }
