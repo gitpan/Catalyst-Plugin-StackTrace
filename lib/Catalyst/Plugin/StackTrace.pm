@@ -8,7 +8,7 @@ use HTML::Entities;
 use Scalar::Util qw/blessed/;
 use NEXT;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 __PACKAGE__->mk_accessors('_stacktrace');
 
@@ -68,6 +68,8 @@ sub finalize_error {
     $c->NEXT::finalize_error(@_);
     
     if ( $c->debug ) {
+        return unless ref $c->_stacktrace eq 'ARRAY';
+
         my $trace = [];   
         for my $frame ( @{ $c->_stacktrace } ) {
             # only display frames from the user's app unless verbose

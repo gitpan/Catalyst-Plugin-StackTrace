@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::Plugin::StackTrace
 
+0.04    2006-03-26 22:30:00
+        - Properly handle the case where finalize_error is called but there
+          is no stacktrace.  This happens if the user manually sets $c->error.
+
 0.03    2006-03-16 23:40:00
         - Made the stack trace fill the entire width.
         - Added respect_overload option for Devel::StackTrace (Stephen
