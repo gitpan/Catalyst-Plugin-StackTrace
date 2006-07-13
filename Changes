@@ -1,5 +1,11 @@
 Revision history for Perl extension Catalyst::Plugin::StackTrace
 
+0.05    2006-07-13 16:34:11
+        - fixed bug where an exception in the $SIG{__DIE__} handler would cause
+          the original exception to be lost
+        - increased contrast on error line (Christopher H. Laco)
+        - added reverse option (Christopher H. Laco)
+
 0.04    2006-03-26 22:30:00
         - Properly handle the case where finalize_error is called but there
           is no stacktrace.  This happens if the user manually sets $c->error.

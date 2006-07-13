@@ -20,6 +20,11 @@ CONFIGURATION
     The number of context lines of code to display on either side of the
     stack frame line. Defaults to 3.
 
+  reverse
+    By default, the stack frames are shown in from "top" to "bottom" (newest
+    to oldest). Enabling this option reverses the stack frames so they will
+    be displayed "bottom" to "top", or from the callers perspective.
+
   verbose
     This option sets the amount of stack frames you want to see in the stack
     trace. It defaults to 0, meaning only frames from your application's

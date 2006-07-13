@@ -1,14 +1,21 @@
 ---
 name: Catalyst-Plugin-StackTrace
-version: 0.04
-author: ~
+version: 0.05
+author:
+  - 'Andy Grundman, <andy@hybridized.org>'
+  - 'Matt S. Trout, <mst@shadowcatsystems.co.uk>'
 abstract: Display a stack trace on the debug screen
 license: perl
+resources:
+  license: http://dev.perl.org/licenses/
 requires:
   Catalyst: 5.61
   Devel::StackTrace: 0
 provides:
   Catalyst::Plugin::StackTrace:
     file: lib/Catalyst/Plugin/StackTrace.pm
-    version: 0.04
-generated_by: Module::Build version 0.2611
+    version: 0.05
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -8,28 +8,28 @@ use HTML::Entities;
 use Scalar::Util qw/blessed/;
 use NEXT;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 __PACKAGE__->mk_accessors('_stacktrace');
 
 sub execute {
     my $c = shift;
-    
+
     # NEXT hack is required when extending execute :(
     local $NEXT::NEXT{ $c, 'execute' };
-    
+
     return $c->NEXT::execute(@_) unless $c->debug;
-    
+
     local $SIG{__DIE__} = sub {
         my $error = shift;
-        
+
         # ignore if the error is a Tree::Simple object
         # because FindByUID uses an internal die several times per request
         return if ( blessed($error) && $error->isa('Tree::Simple') );
-        
+
         my $ignore_package = [ 'Catalyst::Plugin::StackTrace' ];
         my $ignore_class   = [];
-        
+
         if ( $c->config->{stacktrace}->{verbose} < 2 ) {
             $ignore_package = [
                 qw/
@@ -49,28 +49,38 @@ sub execute {
                     /
             ];
         }
-        
-        my $trace = Devel::StackTrace->new(
+        # Devel::StackTrace dies sometimes, and dying in $SIG{__DIE__} does bad
+        # things
+
+        my $trace;
+	eval {
+	  $trace = Devel::StackTrace->new(
             ignore_package   => $ignore_package,
             ignore_class     => $ignore_class,
             no_refs          => 1,
             respect_overload => 1,
-        );
-        $c->_stacktrace( [ $trace->frames ] );
+          );
+        };
+	die $error unless defined $trace;
+
+        my @frames = $c->config->{stacktrace}->{reverse} ?
+            reverse $trace->frames : $trace->frames;
+
+        $c->_stacktrace( [@frames] );
     };
-    
+
     return $c->NEXT::execute(@_);
 }
 
 sub finalize_error {
     my $c = shift;
-    
+
     $c->NEXT::finalize_error(@_);
-    
+
     if ( $c->debug ) {
         return unless ref $c->_stacktrace eq 'ARRAY';
 
-        my $trace = [];   
+        my $trace = [];
         for my $frame ( @{ $c->_stacktrace } ) {
             # only display frames from the user's app unless verbose
             if ( !$c->config->{stacktrace}->{verbose} ) {
@@ -78,14 +88,14 @@ sub finalize_error {
                 $app =~ s/=.*//;
                 next unless $frame->package =~ /^$app/;
             }
-            
+
             push @{$trace}, {
                 pkg  => $frame->package,
                 file => $frame->filename,
                 line => $frame->line,
             };
         }
-        
+
         # insert the stack trace into the error screen above the "infos" div
         my $html = qq{
             <style type="text/css">
@@ -95,11 +105,14 @@ sub finalize_error {
                 div#stacktrace table {
                     width: 100%;
                 }
-                div#stacktrace th, td { 
+                div#stacktrace th, td {
                     padding-right: 1.5em;
                     text-align: left;
                 }
-            </style>            
+                div#stacktrace .line {
+                    color: #E0FFFF;
+                }
+            </style>
             <div class="trace error">
             <h2><a href="#" onclick="toggleDump('stacktrace'); return false">Stack Trace</a></h2>
                 <div id="stacktrace">
@@ -116,12 +129,12 @@ sub finalize_error {
             # .../MyApp/script/../lib/...
             if ( $frame->{file} =~ /../ ) {
                 $frame->{file} =~ s{script/../}{};
-            }            
-            
+            }
+
             my $pkg  = encode_entities $frame->{pkg};
             my $line = encode_entities $frame->{line};
             my $file = encode_entities $frame->{file};
-            my $code_preview = _print_context( 
+            my $code_preview = _print_context(
                 $frame->{file},
                 $frame->{line},
                 $c->config->{stacktrace}->{context}
@@ -143,25 +156,25 @@ sub finalize_error {
                 </div>
             </div>
         };
-        
+
         $c->res->{body} =~ s{<div class="infos">}{$html<div class="infos">};
     }
 }
 
 sub setup {
     my $c = shift;
-    
+
     $c->NEXT::setup(@_);
-    
+
     $c->config->{stacktrace}->{context} ||= 3;
     $c->config->{stacktrace}->{verbose} ||= 0;
 }
 
 sub _print_context {
     my ( $file, $linenum, $context ) = @_;
-    
+
     my $code;
-    if ( -f $file ) { 
+    if ( -f $file ) {
         my $start = $linenum - $context;
         my $end   = $linenum + $context;
         $start = $start < 1 ? 1 : $start;
@@ -171,12 +184,12 @@ sub _print_context {
                 ++$cur_line;
                 last if $cur_line > $end;
                 next if $cur_line < $start;
-                my @tag = $cur_line == $linenum ? qw(<b> </b>) : (q{}, q{});
+                my @tag = $cur_line == $linenum ? ('<strong class="line">', '</strong>') : (q{}, q{});
                 $code .= sprintf(
                     '%s%5d: %s%s',
-                        $tag[0], 
-                        $cur_line, 
-                        $line ? encode_entities $line : q{}, 
+                        $tag[0],
+                        $cur_line,
+                        $line ? encode_entities $line : q{},
                         $tag[1],
                 );
             }
@@ -215,6 +228,12 @@ Configuration is optional and is specified in MyApp->config->{stacktrace}.
 
 The number of context lines of code to display on either side of the stack
 frame line.  Defaults to 3.
+
+=head2 reverse
+
+By default, the stack frames are shown in from "top" to "bottom"
+(newest to oldest). Enabling this option reverses the stack frames so they will
+be displayed "bottom" to "top", or from the callers perspective.
 
 =head2 verbose
 

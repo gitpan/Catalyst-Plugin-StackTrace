@@ -24,6 +24,6 @@ open STDERR, '>/dev/null';
     like( $res->content, qr{Caught exception.+TestApp::Controller::Foo::three}, 'error ok' );
     like( $res->content, qr{Stack Trace}, 'trace ok' );
     like( $res->content, qr{<td>22</td>}, 'line number ok' );
-    like( $res->content, qr{<b>   22:     three()}, 'context ok' );
+    like( $res->content, qr{<strong class="line">   22:     three()}, 'context ok' );
 }
 
