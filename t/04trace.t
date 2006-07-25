@@ -23,7 +23,7 @@ open STDERR, '>/dev/null';
     ok( my $res = request('http://localhost/foo/not_ok'), 'request ok' );
     like( $res->content, qr{Caught exception.+TestApp::Controller::Foo::three}, 'error ok' );
     like( $res->content, qr{Stack Trace}, 'trace ok' );
-    like( $res->content, qr{<td>22</td>}, 'line number ok' );
-    like( $res->content, qr{<strong class="line">   22:     three()}, 'context ok' );
+    like( $res->content, qr{<td>30</td>}, 'line number ok' );
+    like( $res->content, qr{<strong class="line">   30:     three()}, 'context ok' );
 }
 

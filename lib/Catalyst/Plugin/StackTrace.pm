@@ -8,7 +8,7 @@ use HTML::Entities;
 use Scalar::Util qw/blessed/;
 use NEXT;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 __PACKAGE__->mk_accessors('_stacktrace');
 
@@ -33,38 +33,41 @@ sub execute {
         if ( $c->config->{stacktrace}->{verbose} < 2 ) {
             $ignore_package = [
                 qw/
-                    Catalyst
-                    Catalyst::Action
-                    Catalyst::Base
-                    Catalyst::Dispatcher
-                    Catalyst::Plugin::StackTrace
-                    Catalyst::Plugin::Static::Simple
-                    NEXT
-                    main
-                    /
+                   Catalyst
+                   Catalyst::Action
+                   Catalyst::Base
+                   Catalyst::Dispatcher
+                   Catalyst::Plugin::StackTrace
+                   Catalyst::Plugin::Static::Simple
+                   NEXT
+                   main
+                  /
             ];
             $ignore_class = [
                 qw/
-                    Catalyst::Engine
-                    /
+                   Catalyst::Engine
+                  /
             ];
         }
+
         # Devel::StackTrace dies sometimes, and dying in $SIG{__DIE__} does bad
         # things
-
         my $trace;
-	eval {
-	  $trace = Devel::StackTrace->new(
-            ignore_package   => $ignore_package,
-            ignore_class     => $ignore_class,
-            no_refs          => 1,
-            respect_overload => 1,
-          );
-        };
-	die $error unless defined $trace;
+        {
+            local $@;
+            eval {
+                $trace = Devel::StackTrace->new(
+                    ignore_package   => $ignore_package,
+                    ignore_class     => $ignore_class,
+                    no_refs          => 1,
+                    respect_overload => 1,
+                );
+            };
+        }
+        die $error unless defined $trace;
 
         my @frames = $c->config->{stacktrace}->{reverse} ?
-            reverse $trace->frames : $trace->frames;
+        reverse $trace->frames : $trace->frames;
 
         $c->_stacktrace( [@frames] );
     };
@@ -100,7 +103,8 @@ sub finalize_error {
         my $html = qq{
             <style type="text/css">
                 div.trace {
-                    background-color: #5f7e7e;
+                    background-color: #eee;
+                    border: 1px solid #575;
                 }
                 div#stacktrace table {
                     width: 100%;
@@ -110,7 +114,8 @@ sub finalize_error {
                     text-align: left;
                 }
                 div#stacktrace .line {
-                    color: #E0FFFF;
+                    color: #000;
+                    font-weight: strong;
                 }
             </style>
             <div class="trace error">

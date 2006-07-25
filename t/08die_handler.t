@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Test::More;
 
-plan tests => 2;
+plan tests => 4;
 use Catalyst::Test 'TestApp';
 
 open STDERR, '>/dev/null';
@@ -21,6 +21,12 @@ open STDERR, '>/dev/null';
   local *{"Devel::StackTrace::new"} = sub { die "FAILED" };
 
   ok( my $res = request('http://localhost/foo/not_ok'), 'request ok' );
-  my $re = qr{Caught exception in TestApp::Controller::Foo-&gt;crash &quot;Undefined subroutine &amp;TestApp::Controller::Foo::three}s;
+  my $re = qr{Undefined subroutine &amp;TestApp::Controller::Foo::three}s;
   like( $res->content, $re, 'original exception thrown' );
+}
+
+# test that object exceptions aren't eaten
+{
+  ok( my $res = request('http://localhost/foo/not_ok_obj'), 'request ok' );
+  like( $res->content, qr/The sky is falling/, 'object exception thrown' );
 }

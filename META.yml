@@ -1,6 +1,6 @@
 ---
 name: Catalyst-Plugin-StackTrace
-version: 0.05
+version: 0.06
 author:
   - 'Andy Grundman, <andy@hybridized.org>'
   - 'Matt S. Trout, <mst@shadowcatsystems.co.uk>'
@@ -14,7 +14,7 @@ requires:
 provides:
   Catalyst::Plugin::StackTrace:
     file: lib/Catalyst/Plugin/StackTrace.pm
-    version: 0.05
+    version: 0.06
 generated_by: Module::Build version 0.2801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
