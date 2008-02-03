@@ -11,11 +11,7 @@ resources:
 requires:
   Catalyst: 5.61
   Devel::StackTrace: 0
-provides:
-  Catalyst::Plugin::StackTrace:
-    file: lib/Catalyst/Plugin/StackTrace.pm
-    version: 0.06
-generated_by: Module::Build version 0.2801
+generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

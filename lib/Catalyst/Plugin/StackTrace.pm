@@ -2,13 +2,14 @@ package Catalyst::Plugin::StackTrace;
 
 use strict;
 use warnings;
+use 5.008001;
 use base qw/Class::Accessor::Fast/;
 use Devel::StackTrace;
 use HTML::Entities;
 use Scalar::Util qw/blessed/;
 use NEXT;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 __PACKAGE__->mk_accessors('_stacktrace');
 
@@ -70,6 +71,8 @@ sub execute {
         reverse $trace->frames : $trace->frames;
 
         $c->_stacktrace( [@frames] );
+
+        die $error;
     };
 
     return $c->NEXT::execute(@_);
