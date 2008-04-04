@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Test::More;
 
-plan tests => 7;
+plan tests => 10;
 use Catalyst::Test 'TestApp';
 
 open STDERR, '>/dev/null';
@@ -27,3 +27,10 @@ open STDERR, '>/dev/null';
     like( $res->content, qr{<strong class="line">   30:     three()}, 'context ok' );
 }
 
+TestApp->config->{stacktrace}{enable} = 0;
+
+{
+    ok( my $res = request('http://localhost/foo/not_ok'), 'request ok' );
+    like( $res->content, qr{Caught exception.+TestApp::Controller::Foo::three}, 'error ok' );
+    unlike( $res->content, qr{Stack Trace}, 'trace disable' );
+}

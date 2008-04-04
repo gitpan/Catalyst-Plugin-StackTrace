@@ -9,7 +9,7 @@ use HTML::Entities;
 use Scalar::Util qw/blessed/;
 use NEXT;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 __PACKAGE__->mk_accessors('_stacktrace');
 
@@ -19,7 +19,11 @@ sub execute {
     # NEXT hack is required when extending execute :(
     local $NEXT::NEXT{ $c, 'execute' };
 
-    return $c->NEXT::execute(@_) unless $c->debug;
+    my $conf = $c->config->{stacktrace};
+
+    return $c->NEXT::execute(@_) 
+      unless defined $conf->{enable} && $conf->{enable}
+          || !defined $conf->{enable} && $c->debug;
 
     local $SIG{__DIE__} = sub {
         my $error = shift;
@@ -226,11 +230,17 @@ a stack trace of your appliation up to the point where the error occurred.
 Each stack frame is displayed along with the package name, line number, file
 name, and code context surrounding the line number.
 
-This plugin is only active in -Debug mode.
+This plugin is only active in -Debug mode by default, but can be enabled by
+setting the C<enable> config option.
 
 =head1 CONFIGURATION
 
 Configuration is optional and is specified in MyApp->config->{stacktrace}.
+
+=head2 enable
+
+Allows you forcibly enable or disalbe this plugin, ignoring the current 
+debug setting. If this option is defined, its value will be used.
 
 =head2 context
 
