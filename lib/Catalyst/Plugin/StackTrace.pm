@@ -9,7 +9,7 @@ use HTML::Entities;
 use Scalar::Util qw/blessed/;
 use NEXT;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 __PACKAGE__->mk_accessors('_stacktrace');
 
@@ -64,8 +64,6 @@ sub execute {
                 $trace = Devel::StackTrace->new(
                     ignore_package   => $ignore_package,
                     ignore_class     => $ignore_class,
-                    no_refs          => 1,
-                    respect_overload => 1,
                 );
             };
         }
@@ -74,7 +72,22 @@ sub execute {
         my @frames = $c->config->{stacktrace}->{reverse} ?
         reverse $trace->frames : $trace->frames;
 
-        $c->_stacktrace( [@frames] );
+        my $keep_frames = [];
+        for my $frame ( @frames ) {
+            # only display frames from the user's app unless verbose
+            if ( !$c->config->{stacktrace}->{verbose} ) {
+                my $app = "$c";
+                $app =~ s/=.*//;
+                next unless $frame->package =~ /^$app/;
+            }
+
+            push @{$keep_frames}, {
+                pkg  => $frame->package,
+                file => $frame->filename,
+                line => $frame->line,
+            };
+        }
+        $c->_stacktrace( $keep_frames );
 
         die $error;
     };
@@ -89,22 +102,6 @@ sub finalize_error {
 
     if ( $c->debug ) {
         return unless ref $c->_stacktrace eq 'ARRAY';
-
-        my $trace = [];
-        for my $frame ( @{ $c->_stacktrace } ) {
-            # only display frames from the user's app unless verbose
-            if ( !$c->config->{stacktrace}->{verbose} ) {
-                my $app = "$c";
-                $app =~ s/=.*//;
-                next unless $frame->package =~ /^$app/;
-            }
-
-            push @{$trace}, {
-                pkg  => $frame->package,
-                file => $frame->filename,
-                line => $frame->line,
-            };
-        }
 
         # insert the stack trace into the error screen above the "infos" div
         my $html = qq{
@@ -135,7 +132,7 @@ sub finalize_error {
                            <th>File   </th>
                        </tr>
         };
-        for my $frame ( @{$trace} ) {
+        for my $frame ( @{$c->_stacktrace} ) {
 
             # clean up the common filename of
             # .../MyApp/script/../lib/...

@@ -1,5 +1,11 @@
 Revision history for Perl extension Catalyst::Plugin::StackTrace
 
+0.09    2008-09-03 12:00:00
+        - Filter out unwanted stack frames and attributes in the
+          $SIG{__DIE__} handler instead of finalize_error().
+        - Avoid stringifying refs in the trace, since we now throw them
+          away immediately.
+
 0.08    2008-04-04 16:30:00
         - Allow enabling functionality by config variable
 
