@@ -3,7 +3,7 @@ abstract: 'Display a stack trace on the debug screen'
 author:
   - 'Andy Grundman, <andy@hybridized.org>'
 distribution_type: module
-generated_by: 'Module::Install version 0.76'
+generated_by: 'Module::Install version 0.77'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,8 @@ no_index:
 requires:
   Catalyst: 5.70
   Devel::StackTrace: 0
+  MRO::Compat: 0.10
   perl: 5.8.1
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.09
+version: 0.10

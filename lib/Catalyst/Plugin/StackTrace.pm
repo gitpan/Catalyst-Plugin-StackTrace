@@ -7,21 +7,19 @@ use base qw/Class::Accessor::Fast/;
 use Devel::StackTrace;
 use HTML::Entities;
 use Scalar::Util qw/blessed/;
-use NEXT;
+use MRO::Compat;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 __PACKAGE__->mk_accessors('_stacktrace');
 
 sub execute {
     my $c = shift;
 
-    # NEXT hack is required when extending execute :(
-    local $NEXT::NEXT{ $c, 'execute' };
 
     my $conf = $c->config->{stacktrace};
 
-    return $c->NEXT::execute(@_) 
+    return $c->next::method(@_) 
       unless defined $conf->{enable} && $conf->{enable}
           || !defined $conf->{enable} && $c->debug;
 
@@ -45,6 +43,7 @@ sub execute {
                    Catalyst::Plugin::StackTrace
                    Catalyst::Plugin::Static::Simple
                    NEXT
+                   Class::C3
                    main
                   /
             ];
@@ -92,13 +91,13 @@ sub execute {
         die $error;
     };
 
-    return $c->NEXT::execute(@_);
+    return $c->next::method(@_);
 }
 
 sub finalize_error {
     my $c = shift;
 
-    $c->NEXT::finalize_error(@_);
+    $c->next::method(@_);
 
     if ( $c->debug ) {
         return unless ref $c->_stacktrace eq 'ARRAY';
@@ -173,7 +172,7 @@ sub finalize_error {
 sub setup {
     my $c = shift;
 
-    $c->NEXT::setup(@_);
+    $c->next::method(@_);
 
     $c->config->{stacktrace}->{context} ||= 3;
     $c->config->{stacktrace}->{verbose} ||= 0;

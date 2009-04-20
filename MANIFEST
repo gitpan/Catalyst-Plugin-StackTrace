@@ -14,7 +14,6 @@ META.yml
 t/01use.t
 t/02pod.t
 t/03podcoverage.t
-t/04critic.rc
 t/04critic.t
 t/04trace.t
 t/05verbose1.t

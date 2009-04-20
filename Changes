@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst::Plugin::StackTrace
 
+0.10    2009-04-20 13:50:00
+        - Switch to MRO::Compat
+
 0.09    2008-09-03 12:00:00
         - Filter out unwanted stack frames and attributes in the
           $SIG{__DIE__} handler instead of finalize_error().
