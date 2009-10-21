@@ -9,7 +9,7 @@ use HTML::Entities;
 use Scalar::Util qw/blessed/;
 use MRO::Compat;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 __PACKAGE__->mk_accessors('_stacktrace');
 
@@ -307,6 +307,12 @@ The authors of L<CGI::Application::Plugin::DebugScreen>, from which a lot of
 code was used.
 
 =head1 COPYRIGHT
+
+Copyright (c) 2005 - 2009
+the Catalyst::Plugin::StackTrace L</AUTHORS>
+as listed above.
+
+=head1 LICENSE
 
 This program is free software, you can redistribute it and/or modify it
 under the same terms as Perl itself.
