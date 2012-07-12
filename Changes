@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst::Plugin::StackTrace
 
+0.12    2012-07-12 15:13:00 BST
+        - Convert from Class::Accessor::Fast to Moose (dakkar)
+
 0.11    2009-10-18 18:30:00 BST
         - Fixup copyright info
 

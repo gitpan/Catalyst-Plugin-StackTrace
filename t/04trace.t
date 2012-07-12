@@ -24,7 +24,7 @@ open STDERR, '>/dev/null';
     like( $res->content, qr{Caught exception.+TestApp::Controller::Foo::three}, 'error ok' );
     like( $res->content, qr{Stack Trace}, 'trace ok' );
     like( $res->content, qr{<td>30</td>}, 'line number ok' );
-    like( $res->content, qr{<strong class="line">   30:     three()}, 'context ok' );
+    like( $res->content, qr{<strong class="line">   30:     three\(\)}, 'context ok' );
 }
 
 TestApp->config->{stacktrace}{enable} = 0;
